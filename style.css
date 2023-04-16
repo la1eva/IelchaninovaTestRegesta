@@ -1,0 +1,122 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+
+    }
+    
+.container{
+        width: 100%;
+        min-height: 100vh;
+        padding: 5%;
+        background-image: linear-gradient(rgba(35, 36, 41, 0.9),rgba(33, 33, 34, 0.9)), url(images/packs.jfif); 
+        background-position: center;
+        background-size: cover;
+        display:flex;
+        align-items: center;
+        justify-content: center;
+    
+    }   
+.title{
+    position: fixed;
+    width:100%;
+    top: 100px;
+    text-align: center;
+    color: white;
+    font-size: 40px; 
+}
+
+.search-bar{
+    width: 80%;
+    max-width: 700%;
+    background: rgba(227, 224, 224, 0.9);
+    display: flex;
+    align-items: center;
+    border-radius: 60px;
+    padding: 10px 20px;
+    position: absolute;
+}
+
+.search-bar input{
+    background: transparent;
+    flex: 1;
+    border: 0;
+    outline: none;
+    padding: 24px 20px;
+    font-size: 20px;
+    color: rgb(114, 95, 114);
+}
+
+.lable{
+    outline: none;
+    padding: 24px 20px;
+    font-size: 20px;
+    color: rgb(114, 95, 114);
+}
+
+.search-bar img{
+    width: 25px;
+}
+.search-bar button {
+    border: 0;
+    flex:right;
+    border-radius: 60px;
+    width: 60px;
+    height: 60px;
+    background: #49494c;
+    cursor: pointer;
+}
+
+.output-container{
+    position: relative;
+    top: 80px;
+    bottom: 100px;
+    flex: left;
+    color :rgba(227, 224, 224, 0.9);
+    white-space: pre;
+}
+
+.output {
+    position: fixed;
+    width: auto;
+    height: 500px;
+    /* text-align: left; */
+    /* display: block; */
+    left: 10vmax;
+    overflow: hidden;
+
+}
+
+.flag-container{
+    position: relative;
+    flex: left;
+    color :rgba(114, 95, 114, 0.9);
+    white-space: pre;
+    right: 5vmax;
+}
+
+.flag {
+    
+    position: fixed;
+    width: auto;
+    /* text-align: left; */
+    /* display: block; */
+
+}
+
+.assigment{
+    position: fixed;
+    top: 270px;
+    color: white;
+
+}
+
+.radio{
+    position: relative;
+    top: 50px;
+}
+
+.index {
+    margin: 0;
+}
