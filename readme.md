@@ -21,7 +21,7 @@ Si inserisca il modello del prodotto. Per esempio *BRAVIA*
 Questi due inserimenti non sono case sensitive.  
 Si inserisca la quantità. Deve essere un numero naturale positivo maggiore di uno, nel caso contrario si richiederà di reinserire la quantità. Se si tratta invece di un valore decimale, verrà arrotondato per difetto, quindi: se si inserisce *7.1*, la ricerca verrà fatta su *7*; se si inserisce un *0.5* si richiederà il reinserimento.  
 Questi tre campi sono obbligatori e se lasciati vuoti, la ricerca non verrà eseguita e il sistema chiederà il loro inserimento all'utente.  
-Si inserisca il periodo per cui si desidera avere il prodotto. Se si lasciano i due campi vuoti o con valori inadeguati, come per esempio un periodo già passato, il sistema aggiusterà la data con il giorno della ricerca fornendo così la disponibilità immediata.   
+Si inserisca il periodo per cui si desidera avere il prodotto. Se si lascia il campo vuoto o con una data inadeguate, come per esempio un periodo già passato, il sistema aggiusterà la data con il giorno della ricerca fornendo così la disponibilità immediata.   
 Infine, è possibile selezionare se si preferisce la consegna più veloce o il prezzo più conveniente. Di default si preferisce l'opzione con il prezzo più basso.  
 
 
@@ -107,7 +107,7 @@ Tutto l'input è controllato:
 
 Sul campo **prodotto** e **modello** viene eseguito il trim e si raccomanda all'utente di inserire le info se rimane vuoto
 Il campo della **quantità** permette l'inserimento solo dei valori maggiori uguali a 1. Se si inserisce un valore decimale viene arrotondato per difetto. Se manca l'inserimento, si chiede all'utente di provvedere
-I campi che si riferiscono al **periodo** se non modificati, vengono impostati alla data della ricerca; lo stesso avviene se il periodo inserito è precedente al momento della ricerca.
+Il campo che si riferisce al **periodo** se non modificati, vengono impostati alla data della ricerca; lo stesso avviene se il periodo inserito è precedente al momento della ricerca.
 Con due bottoni radio si può selezionare la **preferenza** della ricerca, di base è sul prezzo. Un bottone con l'immagine della lente d'ingrandimento per avviare la ricerca.
 
 Tutta la comunicazione con l'utente avviene attraverso il div "information"
@@ -119,9 +119,9 @@ Si esegue la prima query di ricerca con i dati forniti dall'utente.
 Se il risultato è una tabella contenente almeno una riga si crea un array associativo.  
 
 Si analizza ogni riga e si concatena l'output in una variabile **$S** che verrà inoltrata all'utente. Per valutare se il fornitore soddisfa la richiesta vengono utilizzate diverse funzioni.  
-coutnDays che prende come parametro il periodo inserito dall'utente e calcola quanti giorni si ha a disposizione dalla data di ricerca.  
-ifRestock che esegue una query per controllare se sono previsti dei rifornimenti entro il periodo inserito dall'utente. Questa funzione ritorna il valore della quantità presente con un eventuale rifornimento, o lo stesso valore se non previsto.  
-totalPrice che calcola il prezzo tenendo conto delle offerte.  
+coutnDays che prende come parametro il periodo inserito dall'utente e calcola quanti giorni si ha a disposizione dalla data di ricerca.   
+totalPrice che calcola il prezzo tenendo conto delle offerte. 
+Si tiene conto anche di eventuali restock con una query **$sqlRestock**, in caso la quantità richiesta non sia raggiungibile. Questa querry interoga le tabelle dello **STOCK** e **RESTOCK** controllando per quando sono previsti i rifornimenti e di quanto.   
 
 A ogni passaggio dell'elemento dell'array associativo che contiene le informazioni della ricerca, il prezzo e la consegna vengono confrontati con l'occasione migliore dei precedenti memorizzati in **$bestChoice** e, se ritenuti migliori, l'occasione viene memorizzata in **$bestChoice** a sua volta sostituendo quella precedente. Al primo elemento di array, non avendo dati precedenti con cui essere confrontato, i valori di confronto vengono impostati al massimo rendendo così la prima riga dell'array **$bestChoice** e avviando il confronto tra i risultati della query.  
 
