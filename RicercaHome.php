@@ -26,32 +26,20 @@
                 return $("#information").text("Please, insert the what you are looking for");
             }
 
-            function inputControlDate(month, year){
-                var date = new Date();
-                yyyy = date.getFullYear();
-                mm = date.getMonth() + 1;
-                gg = date.getDate();
-                year.trim();
+            function inputControlDate(date){
+                var today = new Date();
+                yyyy = today.getFullYear();
+                mm = today.getMonth() + 1;
+                gg = today.getDate();
+                today = yyyy + "-0" + mm + "-" + gg; 
+                console.log(today); //2023-4-16
+                console.log(date); //2023-04-22
+                if(date < today || date === null){
+                    document.getElementById("date").value = today;
+                    return today; 
+                }
+                return date;
 
-                if(year === "" || year < yyyy || year === yyyy) {
-                    document.getElementById("year").value = yyyy;
-                    year = yyyy;
-                    if(month < mm || month === ""){
-                        document.getElementById("month").value = mm;
-                        month = mm + 1;
-                        //console.log(yyyy + "-" + mm + "-" + gg);
-                        return yyyy + "-" + mm + "-" + gg;
-                    }
-                };
-                if(month === "" || month < mm ) {
-                    document.getElementById("month").value = mm;
-                    // si aggiunge 1 perché in js i mesi partono da 0 mentre in php da 1
-                    month = mm + 1;
-                    //console.log(yyyy + "-" + mm + "-" + gg);
-                    return yyyy + "-" + mm + "-" + gg;
-                };
-                //console.log(yyyy + "-" + mm + "-" + gg);
-                return yyyy + "-" + mm + "-" + gg;
             }
 
 
@@ -83,9 +71,9 @@
                     var flag = $("#flag1").val();
                     console.log(flag);
                     $.ajax({
-                        url:"Ricerca.php",
+                        url:"ricercaProva.php",
                         type:"POST",
-                        data: ({product: inputControl($("#product").val()), model: inputControl($("#model").val()), amount: inputControlAmount($("#amount").val()), date:inputControlDate($("#month").val(),$("#year").val() ), flag : radioCheck($("#price").val())}),
+                        data: ({product: inputControl($("#product").val()), model: inputControl($("#model").val()), amount: inputControlAmount($("#amount").val()), date:inputControlDate($("#date").val()), flag : radioCheck($("#price").val())}),
                         dataType:"html",
                         beforeSend: funcBefore,
                         success: funcSuccess 
@@ -110,22 +98,7 @@
                 <input type="text" size="10" maxlength="50" name="model" id="model" placeholder="model*" ><br>
                 <input type="text" pattern="^[0-9]*$" size="10" maxlength="4" name="amount" id="amount" placeholder="amount*" ><br>
                 
-                <div class="lable"> month       </div>
-                <select name="month" id="month" style="width: 60px">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
-                    <option value="11">11</option>
-                    <option value="12">12</option>
-                </select>
-                <input type="text" size="10" name="year" id="year" placeholder="year"><br>
+                <input type="date" id="date"><br>
                 <div class="flag-container">
                     Best 
                     <input type="radio" id="price" name="delivery" value="1" >delivery</label>

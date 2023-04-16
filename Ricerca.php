@@ -25,29 +25,6 @@ function countDays($date){
   return $days;
 }
 
-// quanti elementi avro per quella data: ora+restock-5
-function ifRestock($stockId, $conn, $date){
-
-  $sqlRestock = "SELECT restock.next, restock.amount AS restockAmount, stock.amount AS stockAmount
-  FROM stock, restock
-  WHERE stock.id = '$stockId'
-  AND stock.id = restock.stock ";
-
-  $result = mysqli_query($conn, $sqlRestock);
-
-  if (mysqli_num_rows($result) > 0) {
-    foreach ($result as $r){
-      if(floor((strtotime($date) - strtotime($r["next"])) / 86400) > 0){
-        $totalAmount = $r["restockAmount"] + $r["stockAmount"];
-        return $totalAmount;
-      } 
-      $totalAmount =  $r["stockAmount"];
-      return $totalAmount;
-    }
-  }
-}
-
-
 function totalPrice($case, $price, $request, $discount, $amount){
   $total = $price*$amount;
   $newTotal = $total - ($price * $discount/100);
@@ -70,6 +47,8 @@ $sql1 = "SELECT aboutP.supplier, aboutP.price, stock.id AS stockId, stock.amount
 
 $result = mysqli_query($conn, $sql1);
 
+
+
 $S = "";
 $i = 1;
 $bestChoice = "nothing";
@@ -78,68 +57,60 @@ $delivery = 9999999999999;
 
 if (mysqli_num_rows($result) > 0){
     foreach ($result as $r){
+        $stockId = $r["stockId"];
+            $sqlRestock = "SELECT restock.next, restock.amount AS restockAmount, stock.amount AS stockAmount
+            FROM stock, restock
+            WHERE stock.id = '$stockId'
+            AND stock.id = restock.stock ";
+          
+        $result1 = mysqli_query($conn, $sqlRestock);
 
         $days = countDays($date);
-        // nell'immediato        se anche con il restock sono pochi
-        if($days == 0 && $r["amount"] < $amount ){ 
+        foreach ($result1 as $s){
+            $next = $s["next"];
+            $restockAmount = $s["restockAmount"];
+            $stockAmount = $s["stockAmount"];
+        }
+        // nell'immediato
+        if($days == 0 && $r["amount"] < $amount || ( $r["amount"] < $amount && (floor((strtotime($date) - strtotime($s["next"])) / 86400) < 0) || (($s["restockAmount"] + $s["stockAmount"]) < $amount ))){ 
 
           $output = $i.") Supplier ".$r["name"]." is not prompted because it does not have enough stock quantity available"."\n";
           unset($r);
           $i++;
         
         }else{
-          if($r["amount"] < $amount ){ 
 
-            $stockId = $r["stockId"];
-            $sqlRestock = "SELECT restock.next, restock.amount AS restockAmount, stock.amount AS stockAmount
-            FROM stock, restock
-            WHERE stock.id = '$stockId'
-            AND stock.id = restock.stock ";
-          
-            $result1 = mysqli_query($conn, $sqlRestock);
             
-            if (mysqli_num_rows($result1) > 0){
-              foreach ($result1 as $s){
-                if(!floor((strtotime($date) - strtotime($s["next"])) / 86400) > 0 || (($s["restockAmount"] + $s["stockAmount"] - 1) > 0)){
-                  $output = $i.") Supplier ".$r["name"]." is not prompted because it does not have enough stock quantity available"."\n";
-                  unset($r);
-                  $i++;
-                
-                }
-              }
-            }
 
-          }else{
-            $id = $r["id"]; 
-            $totalPrice = $r["price"]*$amount;
+          if(($r["amount"] > $amount) ||((floor((strtotime($date) - strtotime($s["next"])) / 86400) > 0) || (($s["restockAmount"] + $s["stockAmount"]) > $amount ))){
+          $id = $r["id"]; 
+          $totalPrice = $r["price"]*$amount;
 
-            $sql2 = "SELECT code, discount, request
-            FROM discounts
-            WHERE product =  '$id'";
-            $result2 = mysqli_query($conn, $sql2);
+          $sql2 = "SELECT code, discount, request
+          FROM discounts
+          WHERE product =  '$id'";
+          $result2 = mysqli_query($conn, $sql2);
             
             
 
-            if (mysqli_num_rows($result2) > 0){
-              foreach ($result2 as $t){
-                $totalPrice = totalPrice($t["code"], $r["price"], $t["request"], $t["discount"], $amount);
-                $output = $i.") Supplier ".$r["name"]." can fulfill the request for ".$totalPrice."$";
-                $i++;
-              }
-            }else{
+          if (mysqli_num_rows($result2) > 0){
+            foreach ($result2 as $t){
+              $totalPrice = totalPrice($t["code"], $r["price"], $t["request"], $t["discount"], $amount);
               $output = $i.") Supplier ".$r["name"]." can fulfill the request for ".$totalPrice."$";
               $i++;
             }
+          }else{
+            $output = $i.") Supplier ".$r["name"]." can fulfill the request for ".$totalPrice."$";
+            $i++;
+          }
 
             
-            if(!$flag){
-              if($bestPrice > $totalPrice || ($bestPrice == $totalPrice && $delivery > $r["delivery"])){
-
-                $bestChoice = $output;
-                $bestPrice = $totalPrice;
-                $delivery = $r["delivery"];
-                
-              }
+          if(!$flag){
+            if($bestPrice > $totalPrice || ($bestPrice == $totalPrice && $delivery > $r["delivery"])){
+              $bestChoice = $output;
+              $bestPrice = $totalPrice;
+              $delivery = $r["delivery"];
+            }
             }else{
               if($delivery > $r["delivery"]){
                 $bestChoice = $output;
@@ -147,25 +118,20 @@ if (mysqli_num_rows($result) > 0){
               }
             }
 
-
-
-            if($days == 0 || $days >= $r["delivery"]){
-              if($bestChoice === $output) {$bestChoice .= " in ".$r["delivery"]." days \n";}
-              $output .= " in ".$r["delivery"]." days \n";
-            }
+          if($days == 0 || $days >= $r["delivery"]){
+            if($bestChoice === $output) {$bestChoice .= " in ".$r["delivery"]." days \n";}
+            $output .= " in ".$r["delivery"]." days \n";
           }
           
-        } 
-        $S .= $output."\n";
+        }
+          
+      } 
+      $S .= $output."\n";
     }
-    
   }else{
   echo "fail";
-}
-
+  }
   sleep(1);
-
-
   echo str_replace ( $bestChoice,"------------|Best choise|\n".$bestChoice."------------\n",  $S);
   mysqli_close($conn);
 
